@@ -68,29 +68,10 @@ window.dash_clientside = Object.assign({}, window.dash_clientside, {
                         // or whether we leave that to developer to handle.
                         return true;
                     },
-                    // uiShown: function () {
-                    //     // The widget is rendered.
-                    //     // Hide the loader.
-                    //     document.getElementById('firebaseui-auth-container').style.display = 'none';
-                    // }
                 },
                 // Will use popup for IDP Providers sign-in flow instead of the default, redirect.
                 signInFlow: 'popup',
                 signInSuccessUrl: 'https://localhost:8050',
-                // signInFailure: function (error) {
-                //     // For merge conflicts, the error.code will be
-                //     // 'firebaseui/anonymous-upgrade-merge-conflict'.
-                //     if (error.code != 'firebaseui/anonymous-upgrade-merge-conflict') {
-                //         return Promise.resolve();
-                //     }
-                //     // The credential the user tried to sign in with.
-                //     var cred = error.credential;
-                //     // Copy data from anonymous user to permanent user and delete anonymous
-                //     // user.
-                //     // ...
-                //     // Finish sign-in after data is copied.
-                //     return firebase.auth().signInWithCredential(cred);
-                // },
                 signInOptions: [
                     // Leave the lines as is for the providers you want to offer your users.
                     firebase.auth.GoogleAuthProvider.PROVIDER_ID,
@@ -105,15 +86,7 @@ window.dash_clientside = Object.assign({}, window.dash_clientside, {
                 privacyPolicyUrl: 'https://www.google.com'
             };
             ui.start('#firebaseui-auth-container', uiConfig);
-            return "Something New"
-            firebase.auth().onAuthStateChanged((user) => {
-                if (user) {
-                    // User logged in already or has just logged in.
-                    console.log(user.uid);
-                } else {
-                    // User not logged in or has just logged out.
-                }
-            });
+            return "After Auth Start (async)"
         }
     }
 });
