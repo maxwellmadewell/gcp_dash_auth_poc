@@ -23,6 +23,7 @@ app.layout = html.Div([
     html.H2("Welcome"),
     html.H1("Firebase Hosting Setup Complete"),
     html.P(["loading"], id="load"),
+    html.P(["loading2"], id="load2"),
     html.Div(id="firebaseui-auth-container"),
     html.Button(id="login")
 ], id="message")
@@ -33,8 +34,20 @@ app.clientside_callback(
         namespace='clientside',
         function_name='firebase_init'
     ),
+    Output('load2', 'children'),
+    Input('login', 'n_clicks'),
+    prevent_initial_call=False
+)
+
+
+app.clientside_callback(
+    ClientsideFunction(
+        namespace='clientside',
+        function_name='login_google'
+    ),
     Output('load', 'children'),
     Input('login', 'n_clicks'),
+    prevent_initial_call=True
 )
 
 

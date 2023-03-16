@@ -4,7 +4,7 @@ import { initializeApp } from "firebase/app";
 // https://firebase.google.com/docs/web/setup#available-libraries
 
 // Your web app's Firebase configuration
-const f irebaseConfig = {
+const firebaseConfig = {
   apiKey: "AIzaSyAZhH8_A_NmQCY4EFQRTtOUx6RSAzbmmZw",
   authDomain: "authmapdemo.firebaseapp.com",
   databaseURL: "https://authmapdemo-default-rtdb.firebaseio.com",
