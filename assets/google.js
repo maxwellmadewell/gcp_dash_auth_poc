@@ -1,109 +1,79 @@
+require('dotenv').config();
+
 const googleProvider = new firebase.auth.GoogleAuthProvider();
-// Your web app's Firebase configuration
 const firebaseConfig = {
-    apiKey: "AIzaSyAZhH8_A_NmQCY4EFQRTtOUx6RSAzbmmZw",
-    authDomain: "authmapdemo.firebaseapp.com",
-    databaseURL: "https://authmapdemo-default-rtdb.firebaseio.com",
-    projectId: "authmapdemo",
-    storageBucket: "authmapdemo.appspot.com",
-    messagingSenderId: "831221014535",
-    appId: "1:831221014535:web:142118fada6f8af6a54aa2"
+    apiKey: process.env.apiKey,
+    authDomain: process.env.authDomain,
+    databaseURL: process.env.databaseURL,
+    projectId: process.env.projectId,
+    storageBucket: process.env.storageBucket,
+    messagingSenderId: process.env.messagingSenderId,
+    appId: process.env.appId
 };
 const app = firebase.initializeApp(firebaseConfig);
-// Initialize Firebase
-firebase.auth().onAuthStateChanged(function (user) {
-    if (user) {
-        // User is signed in.
-        var uid = user.uid;
-        var email = user.email;
-        var displayName = user.displayName;
-        var photoURL = user.photoURL;
-        var emailVerified = user.emailVerified;
-        var providerData = user.providerData;
-        // Save user's credentials to localStorage
-        var authInfo = {'uid': uid, 'displayName': displayName,
-        'email': email, 'emailVerified': emailVerified}
-    } else {
-        // User is signed out.
-        console.log("-----signed out----- on state observer")
-        var authInfo = null
-    }
-    localStorage.setItem('authInfo', authInfo)
-    const event = new Event('authUpdated');
-    document.dispatchEvent(event);
+
+document.addEventListener('DOMContentLoaded', function () {
+    firebase.auth().onAuthStateChanged(function (user) {
+        if (user) {
+            let authInfo = {
+                'uid': user.uid,
+                'displayName': user.displayName,
+                'email': user.email,
+                'photoURL': user.photoURL,
+                'emailVerified': user.emailVerified,
+                'providerData': user.providerData
+            }
+            localStorage.setItem('userInfoStorage', JSON.stringify(authInfo))
+            const eventLogin = new Event('login', {bubbles: true});
+            document.dispatchEvent(eventLogin);
+        } else {
+            const authInfoEmpty = {
+                'uid': "",
+                'displayName': "",
+                'email': "",
+                'emailVerified': false,
+                'photoURL': 'https://via.placeholder.com/100',
+                'providerData': ""
+            };
+            localStorage.setItem('userInfoStorage', JSON.stringify(authInfoEmpty))
+            const eventLogout = new Event('logout', {bubbles: true});
+            document.dispatchEvent(eventLogout);
+        }
+    });
 });
 
 window.dash_clientside = Object.assign({}, window.dash_clientside, {
     clientside: {
-        window_init: function (_) {
-            console.log("test")
-            // const ui = new firebaseui.auth.AuthUI(firebase.auth());
-            // var uiConfig = {
-            //     callbacks: {
-            //         signInSuccessWithAuthResult: function (authResult, redirectUrl) {
-            //             // User successfully signed in.
-            //             // Return type determines whether we continue the redirect automatically
-            //             // or whether we leave that to developer to handle.
-            //             return true;
-            //         },
-            //     },
-            //     // Will use popup for IDP Providers sign-in flow instead of the default, redirect.
-            //     signInFlow: 'popup',
-            //     signInSuccessUrl: () => {return false},
-            //     signInOptions: [
-            //         // Leave the lines as is for the providers you want to offer your users.
-            //         firebase.auth.GoogleAuthProvider.PROVIDER_ID,
-            //         firebase.auth.FacebookAuthProvider.PROVIDER_ID,
-            //         firebase.auth.TwitterAuthProvider.PROVIDER_ID,
-            //         firebase.auth.GithubAuthProvider.PROVIDER_ID,
-            //         firebase.auth.EmailAuthProvider.PROVIDER_ID,
-            //     ],
-            //     // Terms of service url.
-            //     tosUrl: 'https://www.github.com',
-            //     // Privacy policy url.
-            //     privacyPolicyUrl: 'https://www.google.com'
-            // };
-            // ui.start('#firebaseui-auth-container', uiConfig);
-            // return "After Auth Start (async)"
+        log_user_out: function (clicks) {
+            firebase.auth().signOut().then((result) => {
+                return "true"
+            }).catch((error) => {
+                console.log("Error on Firebase signout")
+                return "false"
+            });
         },
-        login_google: function (_) {
+        log_user_in: function (clicks1, clicks2) {
+            if (clicks1 == null && clicks2 == null ) {
+                return "false"
+            }
             let user = firebase.auth()
                 .signInWithPopup(googleProvider)
                 .then((userCredential) => {
-                    /** @type {firebase.auth.OAuthCredential} */
-                    var credential = user.credential;
-                    // This gives you a Google Access Token. You can use it to access the Google API.
-                    var token = credential.accessToken;
-                    // The signed-in user info.
-                    var user = userCredential.user;
-                    // IdP data available in result.additionalUserInfo.profile
-
-                    console.log("---------Logged IN ---------")
+                    user_creds = {
+                        "credential": user.credential,
+                        "token": user.credential.accessToken,
+                        "user": userCredential.user
+                    }
+                    let user_creds_string = JSON.stringify(user_creds)
+                    localStorage.setItem("userCredentialStorage", user_creds_string)
+                    return "false"
                 }).catch((error) => {
-                    // Handle Errors here.
-                    var errorCode = error.code;
-                    var errorMessage = error.message;
-                    // The email of the user's account used.
-                    var email = error.email;
-                    // The firebase.auth.AuthCredential type that was used.
-                    var credential = error.credential;
-                    // ...
-                    return [errorMessage]
+                    let errorCode = error.code;
+                    let errorMessage = error.message;
+                    let email = error.email;
+                    let credential = error.credential;
+                    return "false"
                 });
-            console.log("returning")
-            return "RETURN TOO SOON"
-        },
-        logout_google: function (_) {
-            firebase.auth().signOut().then((result) => {
-                // Sign-out successful.
-                console.log(result)
-                console.log("SIGNED OUT")
-                return null
-            }).catch((error) => {
-                // An error happened.
-                console.log("ERROR OCCURRED")
-                return null
-            });
         }
     }
 });

@@ -1,52 +1,46 @@
-// Save copy of original setItem method
-// const originalSetItem = localStorage.setItem;
-//
-// // Overwrite setItem to emit authUpdate event and original setItem
-// localStorage.setItem = function (key, value) {
-//     const event = new Event('authUpdate');
-//     event.value = value; // Optional..
-//     event.key = key; // Optional..
-//     if (['uid', 'displayName', 'email', 'emailVerified'].includes(key)) {
-//         console.log('Dispatch for key: ' + key)
-//         document.dispatchEvent(event);
-//     }
-//     originalSetItem.apply(this, arguments);
-// };
+let __user_credentials_setter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, "value").set;
 
-// const localStorageSetHandler = function (e) {
-//     console.log('localStorage.set("' + e.key + '", "' + e.value + '") was called');
-//     const newValue = localStorage.getItem('auth-info')
-//     const hiddenInput = document.getElementById('output');
-//     hiddenInput.value = newValue;
-// };
-const authUpdatedHandler = function (e) {
-    let authInfo = localStorage.getItem('authInfo')
-    console.log(JSON.stringify(authInfo))
-    const hiddenInput = document.getElementById('auth-storage');
-    if (hiddenInput) {
-        hiddenInput.value = JSON.stringify(authInfo);
+const loginHandler = function (e) {
+    let loginNode = document.getElementById('user-bridge-node');
+    if (loginNode) {
+        let loginValue = localStorage.getItem('userInfoStorage')
+        __user_credentials_setter.call(loginNode, loginValue);
+        const evli = new Event('input', {bubbles: true})
+        loginNode.dispatchEvent(evli)
+    } else {
+        console.log("[loginHandler] - loginNode null")
     }
 }
 
-// document.addEventListener("authUpdate", localStorageSetHandler, false);
-document.addEventListener("authUpdated", authUpdatedHandler, false);
+const logoutHandler = function (e) {
+    console.log('[logoutHandler] -  Started')
+    let logoutNode = document.getElementById('user-bridge-node')
 
+    if (logoutNode) {
+        console.log("[logoutHandler] - logoutNode not null")
+        let logoutValue = localStorage.getItem('userInfoStorage')
+        __user_credentials_setter.call(logoutNode, logoutValue);
+        var evlo = new Event('input', {bubbles: true})
+        logoutNode.dispatchEvent(evlo)
+    } else {
+        console.log("[logoutHandler] - log  outNode null")
+    }
+}
 
-// Add event listener to the window object
-// window.addEventListener('storage', (event) => {
-//   console.log("Storage event started -------")
-//   // if (event.key === 'auth-info') {
-//   //   // Get the new value from localStorage
-//   //   console.log("---Matches auth-info")
-//   //   const newValue = localStorage.getItem('auth-info');
-//   //
-//   //   // Update the hidden input field in the Dash layout with the new value
-//   //   const hiddenInput = document.getElementById('output');
-//   //   hiddenInput.value = newValue;
-//   //
-//   //   // Trigger the input's 'change' event to trigger the callback
-//   //   hiddenInput.dispatchEvent(new Event('change'));
-//   // } else {
-//   //   console.log("-----other")
-//   // }
-// });
+const elementLoaded = new Promise((resolve) => {
+  const checkElement = () => {
+    const element = document.getElementById('user-bridge-node');
+    if (element) {
+      resolve(element);
+    } else {
+      window.requestAnimationFrame(checkElement);
+    }
+  };
+  window.requestAnimationFrame(checkElement);
+});
+
+elementLoaded.then((element) => {
+    document.addEventListener("login", loginHandler, false);
+    document.addEventListener("logout", logoutHandler, false);
+});
+
