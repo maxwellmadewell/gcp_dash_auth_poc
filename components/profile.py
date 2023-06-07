@@ -16,9 +16,9 @@ popover_profile = html.Div(
                                                                             "border-radius": "50%"}),
                             ], width=4),
                             dbc.Col([
-                                html.H4("Muchlonger Namelastname", className='mb-0',
+                                html.H4("First LastPlaceHolder", className='mb-0',
                                         id="popover-profile-name", style={"text-align": "left", "min-width": "10vw"}),
-                                html.P("MuchlongerNamelastname@gmail.com", className='mb-0',
+                                html.P("placeholder@gmail.com", className='mb-0',
                                        id="popover-profile-email", style={"text-align": "left", "min-width": "10vw"})
                             ], width=8),
                         ]),

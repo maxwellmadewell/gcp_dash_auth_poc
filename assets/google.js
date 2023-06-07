@@ -1,14 +1,12 @@
-require('dotenv').config();
-
 const googleProvider = new firebase.auth.GoogleAuthProvider();
 const firebaseConfig = {
-    apiKey: process.env.apiKey,
-    authDomain: process.env.authDomain,
-    databaseURL: process.env.databaseURL,
-    projectId: process.env.projectId,
-    storageBucket: process.env.storageBucket,
-    messagingSenderId: process.env.messagingSenderId,
-    appId: process.env.appId
+    apiKey: "AIzaSyAZhH8_A_NmQCY4EFQRTtOUx6RSAzbmmZw",
+    authDomain: "authmapdemo.firebaseapp.com",
+    databaseURL: "https://authmapdemo-default-rtdb.firebaseio.com",
+    projectId: "authmapdemo",
+    storageBucket: "authmapdemo.appspot.com",
+    messagingSenderId: "831221014535",
+    appId: "1:831221014535:web:142118fada6f8af6a54aa2"
 };
 const app = firebase.initializeApp(firebaseConfig);
 

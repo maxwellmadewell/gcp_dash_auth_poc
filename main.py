@@ -6,6 +6,8 @@ from dash.dependencies import ClientsideFunction
 import json
 from firebase_admin import credentials
 from components.profile import profile_icon, popover_profile
+from flask import Flask
+from flask_login import login_user, LoginManager, UserMixin, current_user
 
 # Initialize Firebase app
 cred = credentials.Certificate("C:\\Users\\mxmco\\.config\\gcloud\\authmapdemo-firebase-adminsdk-y0qfs-e6f7182a58.json")
@@ -32,8 +34,21 @@ EXTERNAL_SCRIPTS = [
     {"src": "https://www.gstatic.com/firebasejs/9.13.0/firebase-app-compat.js"},
     {"src": "https://www.gstatic.com/firebasejs/9.13.0/firebase-auth-compat.js"},]
 
-app = Dash(__name__, external_stylesheets=EXTERNAL_STYLESHEETS, external_scripts=EXTERNAL_SCRIPTS,
+server = Flask(__name__)
+app = Dash(__name__, server=server, external_stylesheets=EXTERNAL_STYLESHEETS, external_scripts=EXTERNAL_SCRIPTS,
            suppress_callback_exceptions=True, use_pages=True)
+
+# Login manager object will be used to login / logout users
+login_manager = LoginManager()
+login_manager.init_app(server)
+login_manager.login_view = "/login"
+
+class User(UserMixin):
+    # User data model. It has to have at least self.id as a minimum
+    def __init__(self, username):
+        self.id = username
+
+
 app.layout = html.Div(
     [
         dcc.Location(id="url"),
@@ -47,7 +62,7 @@ app.layout = html.Div(
         dbc.Input(type='text', id='user-bridge-node', style={'display': "None"}),
         html.Hr(),
         html.Div(id="firebaseui-auth-container"),
-        dbc.Button("LOG IN/OUT", id="login", color="danger"),
+        dbc.Button("Sign In", id="login", color="danger"),
         html.Hr(),
         dash.page_container,
     ]
